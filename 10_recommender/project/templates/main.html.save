@@ -1,0 +1,23 @@
+<html>
+<head>
+    <title> Ben"s Movie Recommender</title>
+    <link rel="/static/style.css" type="style/css">
+</head>
+
+<h1>hello world</h1>
+
+<img src="/static/movie.jpg" width="400">
+
+
+<p>This is Ben's <strong>Movie Recommender</strong></p>
+
+
+<form action="/movie" method="GET">
+    movie : <input name="movie1"> <!--input tags don't need to be closed !-->
+    rating: <input name="rating1"> </input>
+    <input type="submit" value="Get a movie recommendation">
+</form>
+
+<!-- not using <a href="/movie">Get a movie recommendation</a> !-->
+
+</html>
