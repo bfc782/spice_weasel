@@ -1,2 +1,2 @@
 # spice_weasel
-hosting the recommender project
+hosting the projects we looked at during spiced
