@@ -54,7 +54,7 @@ sns.set()
 some = ['France', 'Germany', 'Sweden']
 df_subset = df_plot.loc[df_plot['country'].isin(some)]
 sns.lineplot(x='year', y='life_expect', hue='country', data=df_subset)
-
+plt.show()
 
 
 
