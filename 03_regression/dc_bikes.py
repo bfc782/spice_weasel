@@ -22,28 +22,30 @@ ytrain = df_raw[df_raw['yr']==0]['cnt']
 Xtest = df_raw[df_raw['yr']==1]
 ytest = df_raw[df_raw['yr']==1]['cnt']
 
-Xtrain_day = Xtrain[(Xtrain['hr']-Xtrain['season']>=4)&(Xtrain['hr']+Xtrain['season']<=21)]
+sat_14 = (Xtrain['weekday']==6)&(Xtrain['hr']==14)
+df_sat14 = Xtrain[sat_14]
+df_sat14['sc_cnt'] = 0
+min_cnt = df_sat14.min()
+max_cnt = df_sat14.max()
+denom = max_cnt - min_cnt
 
+cnt_s = df_sat14['cnt'].copy
+    
+cnt_scaled = []
+for i in range(len(df_sat14)):
+    cnt_scaled.append((cnt_s[i]-min_cnt)/denom)
 
-Xtrain_day['24hdtemp'] = Xtrain_day['temp'].rolling(24).mean().fillna(method='bfill')
-Xtrain_day['24hdhum'] = Xtrain_day['hum'].rolling(24).mean().fillna(method='bfill')
+df_sat14['sca_cnt'] = cnt_scaled
 
-print(Xtrain_day[['instant','season','mnth','hr','weekday','temp','hum','cnt']].head(48))
+df_sat14[['temp','hum','weathersit','sca_cnt']].plot()
+plt.show()
 
-corr_matrix = Xtrain_day.corr()
-print(corr_matrix['cnt'].sort_values(ascending=False))
+#Xtrain_day = Xtrain[(Xtrain['hr']-Xtrain['season']>=4)&(Xtrain['hr']+Xtrain['season']<=21)]
+#Xtrain_day['24hdtemp'] = Xtrain_day['temp'].rolling(24).mean().fillna(method='bfill')
+#Xtrain_day['24hdhum'] = Xtrain_day['hum'].rolling(24).mean().fillna(method='bfill')
 
-#objective:
-###1) we are interested in predicting when there will be surging demand in the network
-###2) we do not mind being wrong by a few bikes in low usage times
-###3) we will focus on making decent predictions for daytime operations
+#print(Xtrain_day[['instant','season','mnth','hr','weekday','temp','hum','cnt']].head(48))
 
-#hypotheses:
-###1) daytime hour temperature is more important than 24hour - let's average that
-###2) daytime hours are important for the weekend
-###3) commuting hours are important for the weekdays
+#corr_matrix = Xtrain_day.corr()
+#print(corr_matrix['cnt'].sort_values(ascending=False))
 
-#to do:
-###1) determine, define relevant categorical columns
-#### weekday
-###2) groupby humidity

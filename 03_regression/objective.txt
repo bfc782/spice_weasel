@@ -1,0 +1,15 @@
+
+#objective:
+###1) we are interested in predicting the demand on 2pm on Saturday 
+###1,extended) when will there otherwise be a surging demand in the network?
+###2) we do not mind being wrong by a few bikes in low usage times
+###3) we will focus on making decent predictions for daytime operations
+
+#questions:
+###1) are there any column combinations that make sense as features?
+
+#hypotheses:
+###1) daytime hour temperature is more important than 24hour - let's average that
+###2) daytime hours are important for the weekend
+
+
