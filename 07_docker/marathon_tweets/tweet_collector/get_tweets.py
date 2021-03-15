@@ -39,7 +39,7 @@ class TwitterListener(StreamListener):
         'followers_count': t['user']['followers_count']
         }
 
-        logging.critical(f'\n\n TWEET INCOMING: {tweet["text"]}\n\n')
+#        logging.critical(f'\n\n TWEET INCOMING: {tweet["text"]}\n\n')
         db.collections.tweets.insert_one(tweet)
 
     def on_error(self, status):

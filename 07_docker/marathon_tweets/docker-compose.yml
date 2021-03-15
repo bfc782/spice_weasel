@@ -21,11 +21,9 @@ services:
   postgresdb:
     image: postgres
     ports:
-      - 5555:5432
+    - "5555:5432"
     environment:
-    - POSTGRES_USER=${POSTGRES_USER}
     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    - POSTGRES_DB=postgres
 
   etl_job:
     build: etl_job/
@@ -34,3 +32,5 @@ services:
     depends_on:
     - mongodb
     - postgresdb
+    environment:
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
