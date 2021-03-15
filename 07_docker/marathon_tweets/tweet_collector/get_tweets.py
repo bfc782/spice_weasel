@@ -1,6 +1,6 @@
-import config
+#import config
 import os
-from tweepy import OAuthHandler, Strem
+from tweepy import OAuthHandler, Stream
 from tweepy.streaming import StreamListener
 import json
 import logging
@@ -39,6 +39,7 @@ class TwitterListener(StreamListener):
         'followers_count': t['user']['followers_count']
         }
 
+        logging.critical(f'\n\n TWEET INCOMING: {tweet["text"]}\n\n')
         db.collections.tweets.insert_one(tweet)
 
     def on_error(self, status):
@@ -52,4 +53,4 @@ if __name__ == '__main__':
     auth = authenticate()
     listener = TwitterListener()
     stream = Stream(auth, listener)
-stream.filter(track=['marathon'], languages=['en'])
+    stream.filter(track=['marathon'], languages=['en'])
