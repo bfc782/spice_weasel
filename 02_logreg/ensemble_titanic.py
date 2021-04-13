@@ -11,7 +11,6 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import VotingClassifier
 
 from sklearn.model_selection import cross_val_score, cross_val_predict
-from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import plot_confusion_matrix, confusion_matrix, f1_score, precision_score, recall_score, precision_recall_curve, roc_curve
 
 from sklearn.compose import ColumnTransformer
