@@ -1,0 +1,54 @@
+version: '3'
+services:
+
+  mongodb:
+    image: mongo
+    ports: 
+    - 27017:27017
+
+  tweet_collector:
+    build: tweet_collector/
+    volumes:
+    - ./tweet_collector/:/app
+    depends_on:
+    - mongodb
+    environment:
+    - TWITTER_CONSUMER_API_KEY=${TWITTER_CONSUMER_API_KEY}
+    - TWITTER_CONSUMER_API_SECRET=${TWITTER_CONSUMER_API_SECRET}
+    - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+    - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
+
+  postgresdb:
+    image: postgres
+    ports:
+    - "5555:5432"
+    environment:
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  etl_job:
+    build: etl_job/
+    volumes:
+    - ./etl_job/:/app
+    depends_on:
+    - mongodb
+    - postgresdb
+    environment:
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  airflow:
+    image: puckel/docker-airflow
+    volumes:
+    - ./docker-airflow/dags:/usr/local/airflow/dags/
+    - ./docker-airflow/requirements.txt:/requirements.txt
+    ports:
+    - "8081:8080"
+    environment:
+    - LOAD_EX=y
+    command: ["webserver", "scheduler"]
+
+  metabase:
+    image: metabase/metabase
+    ports:
+    - 3000:3000
+    depends_on:
+    - postgresdb

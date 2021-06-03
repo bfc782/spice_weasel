@@ -22,8 +22,6 @@ collection = db.collections.tweets
 
 psw = os.getenv('POSTGRES_PASSWORD')
 
-logging.critical(psw)
-
 uri = f'postgres://postgres:{psw}@postgresdb:5432/postgres'
 
 pg = create_engine(uri, echo=True)
@@ -46,7 +44,5 @@ for e in entries:
   score = sentiment['compound']
   query = "INSERT INTO tweets VALUES (%s, %s, %s, %s, %s);"
   pg.execute(query, (stamp, text, followers, score))
-
-
 
  
