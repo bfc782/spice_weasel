@@ -1,5 +1,6 @@
 #%%
 import pandas as pd
+from pandas.plotting import scatter_matrix
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -11,10 +12,10 @@ from sklearn.model_selection import cross_val_score, cross_val_predict
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import plot_confusion_matrix, f1_score, precision_score, recall_score, precision_recall_curve, roc_curve
+from sklearn.metrics import plot_confusion_matrix, confusion_matrix, f1_score, precision_score, recall_score, precision_recall_curve, roc_curve
 
 #plt.rcParams('figure.figsize') = (12,6)
-
+#%%
 def nan_rows(df,csv_eda="False"):
     is_NaN = df.isnull()
     row_has_NaN = is_NaN.any(axis=1)
@@ -31,8 +32,8 @@ df_train = pd.read_csv(data+train)
 df_test = pd.read_csv(data+test)
 #%%
 #EDA shows very few Embarked NaN - choosing to drop these for the moment.
-df_train = df_train.dropna(subset=['Embarked'])
-df_test = df_test.dropna(subset=['Embarked'])
+# df_train = df_train.dropna(subset=['Embarked'])
+# df_test = df_test.dropna(subset=['Embarked'])
 
 df_train_target = df_train['Survived']
 df_train_num = df_train.drop(['Name','Survived','Sex','Ticket','Cabin','Embarked'],axis=1)
@@ -48,8 +49,11 @@ imputer.fit(df_train_num)
 X = imputer.transform(df_train_num)
 #df_train_tr = pd.DataFrame(X,columns=df_train_num.columns,index=df_train_num.index)
 
-df_train_cat = df_train[['Name','Sex','Ticket','Cabin','Embarked']]
-df_train_cat.name = 'categorical_data'
+df_train_catspec = df_train[['Name','Ticket','Cabin']]
+df_train_catspec.name = 'specific_categorical_data'
+
+df_train_catgen = df_train[['Sex','Embarked']]
+df_train_catgen.name = 'generic_cat_data'
 #nan_rows(df_train_cat) #output to eda folder - most are for cabin, some are for embarked
 
 #Encode fe/male assignments to binary gender assignments (though a modern statistical heuristic may be available for non-binary)
@@ -60,11 +64,11 @@ df_train_cat.name = 'categorical_data'
 ##df_name_emb = df_train_cat[['Name','Embarked']]
 ##df_name_emb.name = 'embarked'
 ##nan_rows(df_name_emb) #only 2 embarkations missing from rawtrain data so going to drop these in the file read stage
-emb_cat = df_train_cat[['Embarked']]
-emb_cat.name = 'emb_cat_now'
+# emb_cat = df_train_cat[['Embarked']]
+# emb_cat.name = 'emb_cat_now'
 #print(nan_rows(emb_cat))
-cat_encoder = OneHotEncoder()
-emb_cat_1hot = cat_encoder.fit_transform(emb_cat)
+# cat_encoder = OneHotEncoder()
+# emb_cat_1hot = cat_encoder.fit_transform(emb_cat)
 #%%
 num_pipeline = Pipeline([
     ('imputer', SimpleImputer(strategy='median')),
@@ -73,13 +77,17 @@ num_pipeline = Pipeline([
 
 #df_train_num_tr = num_pipeline.fit_transform(df_train_num)
 num_attribs = list(df_train_num)
-sex_enc = ['Sex']
-emb_enc = ['Embarked']
+
+cat_pipeline = Pipeline([
+    ('missing', SimpleImputer(strategy='most_frequent')),
+    ('one_hot', OneHotEncoder(sparse=False, handle_unknown='ignore')),
+  ])
+cat_attribs = list(df_train_catgen)
+
 #%%
 full_pipeline = ColumnTransformer([
     ('num', num_pipeline, num_attribs),
-    ('sex', OneHotEncoder(), sex_enc),
-    ('emb', OneHotEncoder(), emb_enc),
+    ('cat', cat_pipeline, cat_attribs),
   ])
 
 X_train = full_pipeline.fit_transform(df_train)
@@ -102,6 +110,11 @@ plot_confusion_matrix(estimator=m,
                       X=X_train,
                       y_true=y_train,
                       normalize=None)
+
+#%%
+tn, fp, fn, tp = confusion_matrix(y_train, m.predict(X_train)).ravel()
+print(tn, fp, fn, tp)
+
 # %%
 
 print(f'precision for survival predict:{round(precision_score(y_train, m.predict(X_train), pos_label=1),2)}')
