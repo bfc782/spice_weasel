@@ -2,11 +2,13 @@ version: '3'
 services:
 
   mongodb:
-    image: mongo
+    platform: linux/amd64
+    image: mongo:4.4
     ports: 
     - 27017:27017
 
   tweet_collector:
+    platform: linux/amd64
     build: tweet_collector/
     volumes:
     - ./tweet_collector/:/app
@@ -19,6 +21,7 @@ services:
     - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
 
   postgresdb:
+    platform: linux/amd64  
     image: postgres
     ports:
     - "5555:5432"
@@ -26,6 +29,7 @@ services:
     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
   etl_job:
+    platform: linux/amd64
     build: etl_job/
     volumes:
     - ./etl_job/:/app

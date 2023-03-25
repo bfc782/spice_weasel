@@ -38,7 +38,7 @@ services:
   airflow:
     image: puckel/docker-airflow
     volumes:
-    - ./docker-airflow/dags:/usr/local/airflow/dags/
+    - ./docker-airflow/dags/:/usr/local/airflow/dags/
     - ./docker-airflow/requirements.txt:/requirements.txt
     ports:
     - "8081:8080"

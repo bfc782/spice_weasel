@@ -11,17 +11,17 @@ from datetime import datetime, timedelta
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2015, 6, 1),
-    "email": ["stefan@spiced-academy.com"],
+    "start_date": datetime(2022, 5, 11),
+    "email": ["bfc782@hotmail.com"],
     "email_on_failure": True,
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
-    # 'end_date': datetime(2016, 1, 1),
+    'end_date': datetime(2022, 5, 12),
 }
 
 ##### 3. Instantiate DAG #####
-dag = DAG("tutorial", default_args=default_args, schedule_interval=timedelta(minutes=1))
+dag = DAG("tutorial", default_args=default_args, schedule_interval=timedelta(minutes=5))
 
 ##### 4. Create Tasks #####
 t1 = BashOperator(task_id="print_date", bash_command="date", dag=dag)

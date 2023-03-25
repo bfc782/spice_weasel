@@ -1,5 +1,5 @@
 # Use an official Python runtmie as a parent image
-FROM python:3.8-slim
+FROM --platform=linux/amd64 python:3.8-slim
 
 # Set the working directory to /app
 WORKDIR /app

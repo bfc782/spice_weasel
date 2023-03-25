@@ -1,31 +1,34 @@
 #import config
+# %%
 import os
-from tweepy import OAuthHandler, Stream
-from tweepy.streaming import StreamListener
+from tweepy import OAuth1UserHandler, StreamingClient, Stream
+
 import json
 import logging
 import pymongo
 import time
 
-client = pymongo.MongoClient("mongodb")
-db = client.tweets
+client = pymongo.MongoClient(host="mongodb", port=27017)
+db = client.twitter
 
 time.sleep(10)
 
-api_key = os.getenv('TWITTER_CONSUMER_API_KEY')
-api_secret = os.getenv('TWITTER_CONSUMER_API_SECRET')
+consumer_key = os.getenv('TWITTER_CONSUMER_API_KEY')
+consumer_secret = os.getenv('TWITTER_CONSUMER_API_SECRET')
 access_token = os.getenv('TWITTER_ACCESS_TOKEN')
-access_secret = os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
+access_token_secret = os.getenv('TWITTER_ACCESS_TOKEN_SECRET')
 
 def authenticate():
     '''Function for handling Twitter Auth. Pulls Env Variables in bash_profile'''
 
-    auth = OAuthHandler(api_key, api_secret)
-    auth.set_access_token(access_token, access_secret)
+    auth = OAuth1UserHandler(
+        consumer_key, consumer_secret,
+        access_token, access_token_secret
+        )
 
     return auth
 
-class TwitterListener(StreamListener):
+class TwitterListener(Stream):
 
     def on_data(self, data):
         '''This method is what happens to every tweet as it is intercepted in real time'''
@@ -34,13 +37,20 @@ class TwitterListener(StreamListener):
 
         tweet = {
         'created_at': t['created_at'],
+        'geo': t['geo'],
         'text': t['text'],
         'username': t['user']['screen_name'],
         'followers_count': t['user']['followers_count']
         }
 
-#        logging.critical(f'\n\n TWEET INCOMING: {tweet["text"]}\n\n')
-        db.collections.tweets.insert_one(tweet)
+        logging.critical(f'''\n\n 
+        TWEET INCOMING: 
+        {tweet["text"]} \n\n
+        {tweet["geo"]}
+        
+        \n\n''')
+
+        db.tweets.insert_one(dict(tweet))
 
     def on_error(self, status):
 
@@ -51,6 +61,11 @@ class TwitterListener(StreamListener):
 if __name__ == '__main__':
 
     auth = authenticate()
-    listener = TwitterListener()
-    stream = Stream(auth, listener)
-    stream.filter(track=['marathon'], languages=['en'])
+
+    listener = TwitterListener(
+        auth.consumer_key, auth.consumer_secret,
+        auth.access_token, auth.access_token_secret
+    )
+    listener.filter(track=['commutif'], languages=['en'])
+
+# %%
