@@ -1,3 +1,4 @@
+#%%
 import pandas as pd
 import numpy as np
 from stop_words import get_stop_words
@@ -33,3 +34,5 @@ plt.show()
 #print(df_pre.columns)
 #print(df.head())
 print(df['speaker'].value_counts())
+
+# %%
